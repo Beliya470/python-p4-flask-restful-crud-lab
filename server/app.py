@@ -16,7 +16,7 @@ class Plants(Resource):
     def get(self):
         plants = [plant.to_dict() for plant in Plant.query.all()]
         return make_response(jsonify(plants), 200)
-
+    
     def post(self):
         data = request.get_json()
         new_plant = Plant(
@@ -35,28 +35,27 @@ class PlantByID(Resource):
         if not plant:
             return make_response(jsonify({"error": "Plant not found"}), 404)
         return make_response(jsonify(plant.to_dict()), 200)
-
+    
     def patch(self, id):
         plant = Plant.query.filter_by(id=id).first()
         if not plant:
             return make_response(jsonify({"error": "Plant not found"}), 404)
-        
         data = request.get_json()
         plant.is_in_stock = data.get('is_in_stock', plant.is_in_stock)
         db.session.commit()
-        
         return make_response(jsonify(plant.to_dict()), 200)
 
     def delete(self, id):
         plant = Plant.query.filter_by(id=id).first()
         if not plant:
             return make_response(jsonify({"error": "Plant not found"}), 404)
-        
         db.session.delete(plant)
         db.session.commit()
-        
         return make_response('', 204)
 
+@app.route('/', methods=['GET'])
+def home():
+    return "Welcome to the Plant Store API!"
 
 api.add_resource(Plants, '/plants')
 api.add_resource(PlantByID, '/plants/<int:id>')
